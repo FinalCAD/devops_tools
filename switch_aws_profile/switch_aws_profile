@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# switch from one AWS profile to another
+
+set -u
+
+PROFILES=($(cat ~/.aws/config | awk  '{if ($1 ~/\[/) print $2}' | sed "1d" |tr -d ']'))
+
+PROFILE=""
+select OPT in "${PROFILES[@]}"
+do
+  PROFILE="${OPT}"
+  break
+done >&2
+
+echo "unset AWS_ACCESS_KEY_ID ;"
+echo "unset AWS_SECRET_ACCESS_KEY;"
+echo "export AWS_PROFILE=${PROFILE};"
+echo "export AWS_DEFAULT_PROFILE=${PROFILE};"
+

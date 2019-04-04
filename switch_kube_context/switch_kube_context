@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# switch from one k8s cluster to another
+
+set -u
+
+
+CONTEXTS=($(kubectl config  get-contexts -o name | tr "\n" " " ))
+
+select OPT in "${CONTEXTS[@]}"
+do
+  kubectl config use-context "$OPT"
+  echo "Context is now $OPT"
+  break
+done

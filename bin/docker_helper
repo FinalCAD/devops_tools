@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -ux
+
+
+help () {
+  echo "$(basename "$0") git flow base docker tagging"
+  exit 1
+}
+
+[[ -d ".git" ]] || exit 1
+
+IMG_NAME="$1"
+
+# git describe --always --tags --dirty
+CURRENT_BRANCH=$( git rev-parse --abbrev-ref HEAD)
+CURRENT_TAG=$(git describe --tags --abbrev=0)
+SHORT_SHA=$(git log -1 --pretty=%h)
+
+if [[ $CURRENT_BRANCH = master* ]]
+then
+  TAG="master:${CURRENT_TAG}"
+elif [[ $CURRENT_BRANCH = release* ]]
+then
+  TAG="${CURRENT_BRANCH//\//:}-${SHORT_SHA}"
+else
+  TAG="develop:${SHORT_SHA}"
+fi
+
+IMG="${IMG_NAME}:latest"
+
+docker build . -t "${IMG}"
+
+docker tag "$IMG" "${TAG}"
